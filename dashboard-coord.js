@@ -260,12 +260,8 @@ async function renderPessoas() {
     }
 
     // Garante que o prefixo do ID está correto por role
-    let idExibido = p.numero || '—';
-    if (p.numero) {
-      if (isCoord && !p.numero.startsWith('DC-C-'))        idExibido = p.numero;
-      else if (isMestre && !p.numero.startsWith('DC-MT-')) idExibido = p.numero;
-      else if (!isCoord && !isMestre && !p.numero.startsWith('DC-MB-')) idExibido = p.numero;
-    }
+    const idRaw = p.numero || p.credencial || '—';
+    let idExibido = idRaw;
 
     const btnPromover = !isCoord && canEdit ? `
       <button class="btn-acao ${isMestre ? 'rebaixar' : 'promover'}" title="${isMestre ? 'Rebaixar a Membro' : 'Promover a Mestre'}"

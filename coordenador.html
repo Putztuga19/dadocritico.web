@@ -86,24 +86,24 @@
       <section class="dash-section" id="section-membros">
         <div class="dash-section-header">
           <h2><i class="fas fa-users"></i> Membros e Coordenadores</h2>
-          <div class="header-actions">
-            <div class="search-wrap">
-              <i class="fas fa-search search-icon"></i>
-              <input type="text" class="search-input" id="searchPessoas"
-                placeholder="Buscar por nome, apelido ou ID..." oninput="filterPessoas()" />
-            </div>
-            <button class="btn btn-recusar" id="btnRemoverTodos" onclick="removerTodosMembros()" style="padding:0.5rem 1rem;font-size:0.78rem;display:flex;align-items:center;gap:0.4rem;">
-              <i class="fas fa-trash"></i> Remover todos
-            </button>
-          </div>
+          <button class="btn btn-recusar" id="btnRemoverTodos" onclick="removerTodosMembros()" style="padding:0.4rem 0.8rem;font-size:0.72rem;display:flex;align-items:center;gap:0.35rem;">
+            <i class="fas fa-trash"></i> Remover todos
+          </button>
         </div>
 
-        <!-- TABS: Todos / Membros / Coordenadores -->
-        <div class="filter-tabs" id="filterTabs">
-          <button class="filter-tab active" data-filter="todos" onclick="setFilter(this)">Todos</button>
-          <button class="filter-tab" data-filter="membro" onclick="setFilter(this)">Membros</button>
-          <button class="filter-tab" data-filter="mestre" onclick="setFilter(this)">Mestres</button>
-          <button class="filter-tab" data-filter="coord" onclick="setFilter(this)">Coordenadores</button>
+        <!-- TABS + PESQUISA na mesma linha -->
+        <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+          <div class="filter-tabs" id="filterTabs" style="margin-bottom:0;flex-wrap:wrap;">
+            <button class="filter-tab active" data-filter="todos" onclick="setFilter(this)">Todos</button>
+            <button class="filter-tab" data-filter="membro" onclick="setFilter(this)">Membros</button>
+            <button class="filter-tab" data-filter="mestre" onclick="setFilter(this)">Mestres</button>
+            <button class="filter-tab" data-filter="coord" onclick="setFilter(this)">Coordenadores</button>
+          </div>
+          <div class="search-wrap" style="margin-left:auto;">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" id="searchPessoas"
+              placeholder="Buscar por nome, apelido ou ID..." oninput="filterPessoas()" />
+          </div>
         </div>
 
         <div class="membros-table-wrap">
