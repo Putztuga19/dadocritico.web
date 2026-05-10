@@ -19,6 +19,9 @@
   --font-b:   'Crimson Pro', serif;
   --radius:   8px;
   --ease:     0.25s ease;
+  --text:       #f0ede8;
+  --text-muted: #888896;
+  --surface:    #28282f;
 }
 
 html { scroll-behavior: smooth; }
