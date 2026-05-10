@@ -447,6 +447,8 @@ function removerTodosMembros() {
   );
   document.getElementById('confirmBtn').className = 'btn btn-recusar';
 }
+
+function removerPessoa(uid, nome) {
   openConfirm(
     'Remover Membro',
     `Tens a certeza que queres remover ${nome}? Esta ação não pode ser desfeita.`,
