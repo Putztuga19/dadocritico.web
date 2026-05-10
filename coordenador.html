@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel de Coordenação — Dado Crítico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body class="dash-body">
+
+  <nav class="navbar scrolled" id="navbar">
+    <a href="index.html" class="nav-logo"><img src="logo.png" alt="Dado Crítico" /></a>
+    <div class="nav-user">
+      <span class="nav-user-name" id="navUserName">Coordenador</span>
+      <span class="nav-user-code" id="navUserCode" style="font-family:var(--font-h);font-size:0.68rem;color:var(--gold);letter-spacing:0.1em;"></span>
+      <button class="btn-logout" onclick="_doLogoutSair()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+    </div>
+  </nav>
+
+  <main class="dash-main">
+    <aside class="dash-sidebar">
+      <div class="sidebar-avatar">
+        <div class="avatar-circle coord" id="avatarCircle">C</div>
+        <div class="sidebar-name" id="sidebarName">Coordenador</div>
+        <div class="sidebar-role coord">Coordenador</div>
+        <div style="font-family:var(--font-h);font-size:0.68rem;color:var(--gold);margin-top:0.3rem;letter-spacing:0.08em;" id="sidebarCode"></div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="sidebar-link active" data-section="adesoes">
+          <i class="fas fa-inbox"></i> Pedidos de Adesão
+          <span class="badge" id="badgeAdesoes">0</span>
+        </a>
+        <a href="#" class="sidebar-link" data-section="membros">
+          <i class="fas fa-users"></i> Membros e Coordenadores
+        </a>
+        <a href="#" class="sidebar-link" data-section="eventos">
+          <i class="fas fa-calendar-alt"></i> Eventos
+          <span class="badge" id="badgeEventos" style="display:none">0</span>
+        </a>
+        <a href="#" class="sidebar-link" data-section="sessoes">
+          <i class="fas fa-dice-d20"></i> Sessões e Sala
+          <span class="badge" id="badgeReservas" style="display:none;background:var(--gold);color:#1c1c20;">!</span>
+        </a>
+        <a href="#" class="sidebar-link" data-section="coordenadores">
+          <i class="fas fa-shield-alt"></i> Registar Coordenador
+        </a>
+        <a href="#" class="sidebar-link" data-section="dados">
+          <i class="fas fa-database"></i> Dados
+        </a>
+        <div style="border-top:1px solid rgba(255,255,255,0.07);margin:0.75rem 0;"></div>
+        <a href="mestre.html" class="sidebar-link" style="opacity:0.7;">
+          <i class="fas fa-hat-wizard"></i> Área de Mestre
+        </a>
+        <a href="membro.html" class="sidebar-link" style="opacity:0.7;">
+          <i class="fas fa-user"></i> Área de Membro
+        </a>
+      </nav>
+      <button class="btn-logout-full" onclick="_doLogoutConta()">
+        <i class="fas fa-sign-out-alt"></i> Sair da conta
+      </button>
+    </aside>
+
+    <div class="dash-content">
+
+      <!-- ===================== PEDIDOS DE ADESÃO ===================== -->
+      <section class="dash-section active" id="section-adesoes">
+        <div class="dash-section-header">
+          <h2><i class="fas fa-inbox"></i> Pedidos de Adesão</h2>
+          <span class="header-count" id="countAdesoes">0 pedidos aguardando</span>
+        </div>
+        <div class="fichas-lista" id="adesoesList">
+          <div class="empty-state" id="emptyAdesoes">
+            <i class="fas fa-dragon"></i>
+            <p>Nenhum pedido de adesão no momento!</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== MEMBROS E COORDENADORES ===================== -->
+      <section class="dash-section" id="section-membros">
+        <div class="dash-section-header">
+          <h2><i class="fas fa-users"></i> Membros e Coordenadores</h2>
+          <div class="header-actions">
+            <div class="search-wrap">
+              <i class="fas fa-search search-icon"></i>
+              <input type="text" class="search-input" id="searchPessoas"
+                placeholder="Buscar por nome, apelido ou ID..." oninput="filterPessoas()" />
+            </div>
+            <button class="btn btn-recusar" id="btnRemoverTodos" onclick="removerTodosMembros()" style="padding:0.5rem 1rem;font-size:0.78rem;display:flex;align-items:center;gap:0.4rem;">
+              <i class="fas fa-trash"></i> Remover todos
+            </button>
+          </div>
+        </div>
+
+        <!-- TABS: Todos / Membros / Coordenadores -->
+        <div class="filter-tabs" id="filterTabs">
+          <button class="filter-tab active" data-filter="todos" onclick="setFilter(this)">Todos</button>
+          <button class="filter-tab" data-filter="membro" onclick="setFilter(this)">Membros</button>
+          <button class="filter-tab" data-filter="mestre" onclick="setFilter(this)">Mestres</button>
+          <button class="filter-tab" data-filter="coord" onclick="setFilter(this)">Coordenadores</button>
+        </div>
+
+        <div class="membros-table-wrap">
+          <table class="membros-table">
+            <thead>
+              <tr>
+                <th>Membro</th>
+                <th>ID</th>
+                <th>Tipo</th>
+                <th>Data de Entrada</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="pessoasBody"></tbody>
+          </table>
+          <div class="empty-state hidden" id="emptyPessoas">
+            <i class="fas fa-users"></i>
+            <p>Nenhum resultado encontrado.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== EVENTOS ===================== -->
+      <section class="dash-section" id="section-eventos">
+        <div class="dash-section-header">
+          <h2><i class="fas fa-calendar-alt"></i> Eventos</h2>
+          <button class="btn btn-primary" data-action="novo-evento">
+            <i class="fas fa-plus"></i> <span>Novo Evento</span>
+          </button>
+        </div>
+        <p class="section-desc">Gere os eventos visíveis no painel dos membros.</p>
+        <div id="eventosList">
+          <div class="empty-state" id="emptyEventos">
+            <i class="fas fa-calendar-alt"></i>
+            <p>Nenhum evento criado ainda.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== ZONA DE PERIGO ===================== -->
+      <section class="dash-section" id="section-sessoes">
+        <div class="dash-section-header">
+          <h2><i class="fas fa-dice-d20"></i> Sessões e Sala</h2>
+        </div>
+        <p class="section-desc">Visão geral de todas as sessões criadas pelos mestres e gestão das reservas de sala.</p>
+
+        <div style="margin-bottom:1.5rem;" id="coordSalaStatus"></div>
+
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:1.5rem;overflow:hidden;">
+          <div style="padding:0.9rem 1.2rem;border-bottom:1px solid var(--border);background:var(--bg-alt);display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-family:var(--font-h);font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:0.5rem;">
+              <i class="fas fa-calendar-alt" style="color:#a374e8;"></i> Reservas de Sala Ativas
+            </span>
+          </div>
+          <div id="coordReservasList" style="padding:0.4rem 0;">
+            <div style="color:var(--muted);font-size:0.88rem;padding:1rem 1.2rem;">A carregar...</div>
+          </div>
+        </div>
+
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+          <div style="padding:0.9rem 1.2rem;border-bottom:1px solid var(--border);background:var(--bg-alt);">
+            <span style="font-family:var(--font-h);font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:0.5rem;">
+              <i class="fas fa-dice-d20" style="color:#a374e8;"></i> Todas as Sessões
+            </span>
+          </div>
+          <div id="coordSessoesList" style="padding:0.4rem 0;">
+            <div style="color:var(--muted);font-size:0.88rem;padding:1rem 1.2rem;">A carregar...</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== EVENTOS ===================== -->
+      <section class="dash-section" id="section-eventos">
+        <div class="dash-section-header">
+          <h2><i class="fas fa-calendar-alt"></i> Eventos</h2>
+          <button class="btn btn-primary" data-action="novo-evento">
+            <i class="fas fa-plus"></i> <span>Novo Evento</span>
+          </button>
+        </div>
+        <p class="section-desc">Gere os eventos visíveis no painel dos membros.</p>
+        <div id="eventosList">
+          <div class="empty-state" id="emptyEventos">
+            <i class="fas fa-calendar-alt"></i>
+            <p>Nenhum evento criado ainda.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== ZONA DE PERIGO ===================== -->
+      <section class="dash-section" id="section-dados">
+        <div class="dash-section-header">
+          <h2><i class="fas fa-database"></i> Dados</h2>
+        </div>
+        <p class="section-desc">Ferramentas de gestão de dados. Usa com cuidado.</p>
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;max-width:480px;">
+          <div style="font-family:var(--font-h);font-size:0.8rem;font-weight:700;margin-bottom:0.5rem;color:var(--red);display:flex;align-items:center;gap:0.5rem;">
+            <i class="fas fa-exclamation-triangle"></i> Limpar dados de teste
+          </div>
+          <p style="color:var(--muted);font-size:0.88rem;margin-bottom:1.2rem;">
+            Remove todos os membros e pedidos de adesão guardados localmente. Os códigos de coordenador não são apagados. Usa isto para limpar dados de demonstração ou dados corrompidos.
+          </p>
+          <button class="btn btn-recusar" onclick="limparDadosTeste()">
+            <i class="fas fa-trash"></i> Limpar membros e pedidos
+          </button>
+        </div>
+      </section>
+
+      <!-- ===================== REGISTAR COORDENADOR ===================== -->
+      <section class="dash-section" id="section-coordenadores">
+        <div class="dash-section-header">
+          <h2><i class="fas fa-shield-alt"></i> Coordenadores</h2>
+          <button class="btn btn-primary" onclick="abrirModalNovoCoord()">
+            <i class="fas fa-plus"></i> <span>Novo Coordenador</span>
+          </button>
+        </div>
+        <p class="section-desc">
+          Gestão de coordenadores ativos. Clica em <strong>Novo Coordenador</strong> para criar um acesso.
+        </p>
+
+        <!-- CARDS DE COORDENADORES -->
+        <div id="coordCardsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;margin-top:0.5rem;">
+          <div class="empty-state" id="emptyCoordCards" style="grid-column:1/-1;">
+            <i class="fas fa-shield-alt"></i>
+            <p>Nenhum coordenador registado ainda.</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- MODAL: VER PEDIDO DE ADESÃO -->
+  <div class="modal-overlay hidden" id="modalAdesao">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fas fa-scroll"></i> Pedido de Adesão</h3>
+        <button onclick="closeModal('modalAdesao')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" id="modalAdesaoBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-recusar" onclick="decidirAdesao('recusar')"><i class="fas fa-times"></i> Recusar</button>
+        <button class="btn btn-aprovar" onclick="decidirAdesao('aprovar')"><i class="fas fa-check"></i> Aprovar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIRMAR -->
+  <div class="modal-overlay hidden" id="modalConfirm">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h3 id="confirmTitle">Confirmar</h3>
+        <button onclick="closeModal('modalConfirm')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body"><p id="confirmMsg"></p></div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalConfirm')">Cancelar</button>
+        <button class="btn btn-primary" id="confirmBtn">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: NOVO COORDENADOR -->
+  <div class="modal-overlay hidden" id="modalNovoCoord">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fas fa-shield-alt" style="color:var(--gold)"></i> Novo Coordenador</h3>
+        <button onclick="closeModal('modalNovoCoord')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <!-- Credencial preview -->
+        <div style="display:flex;align-items:center;gap:0.75rem;padding:0.9rem 1.1rem;background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.22);border-radius:var(--radius);margin-bottom:1.4rem;">
+          <i class="fas fa-key" style="color:var(--gold);font-size:1.1rem;flex-shrink:0;"></i>
+          <div>
+            <div style="font-family:var(--font-h);font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.2rem;">Credencial gerada</div>
+            <div style="font-family:var(--font-h);font-size:1.1rem;font-weight:700;color:var(--gold);letter-spacing:0.12em;" id="novoCoordPreviewCode">DC-C-—</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.9rem;">
+          <div class="modal-group" style="margin-bottom:0;">
+            <label class="modal-label">Nome *</label>
+            <input class="modal-input" type="text" id="ncNome" placeholder="Nome completo..." oninput="previewCoordCode()" />
+            <span class="modal-err" id="err-ncNome"></span>
+          </div>
+          <div class="modal-group" style="margin-bottom:0;">
+            <label class="modal-label">Apelido</label>
+            <input class="modal-input" type="text" id="ncApelido" placeholder="Apelido no clube..." />
+          </div>
+        </div>
+
+        <div class="modal-group" style="margin-top:0.9rem;">
+          <label class="modal-label">E-mail</label>
+          <input class="modal-input" type="email" id="ncEmail" placeholder="email@exemplo.com" />
+          <span class="modal-err" id="err-ncEmail"></span>
+        </div>
+
+        <div class="modal-group">
+          <label class="modal-label">Senha Provisória</label>
+          <div style="display:flex;gap:0.5rem;align-items:center;">
+            <label style="display:flex;align-items:center;gap:0.5rem;padding:0.55rem 1rem;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;flex:1;transition:all 0.25s;" id="optSenhaAuto">
+              <input type="radio" name="ncSenhaTipo" value="auto" checked onchange="toggleSenhaTipo()" style="accent-color:var(--gold);" />
+              <span style="font-size:0.88rem;color:var(--muted);"><i class="fas fa-magic" style="margin-right:0.35rem;"></i>Gerar automática</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:0.5rem;padding:0.55rem 1rem;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;flex:1;transition:all 0.25s;" id="optSenhaManual">
+              <input type="radio" name="ncSenhaTipo" value="manual" onchange="toggleSenhaTipo()" style="accent-color:var(--gold);" />
+              <span style="font-size:0.88rem;color:var(--muted);"><i class="fas fa-pen" style="margin-right:0.35rem;"></i>Definir manualmente</span>
+            </label>
+          </div>
+          <div id="ncSenhaManualWrap" style="display:none;margin-top:0.6rem;">
+            <input class="modal-input" type="text" id="ncSenhaManual" placeholder="Senha provisória..." />
+            <span class="modal-err" id="err-ncSenha"></span>
+          </div>
+          <div id="ncSenhaAutoPreview" style="margin-top:0.5rem;font-size:0.82rem;color:var(--muted);"></div>
+        </div>
+
+        <div class="modal-group">
+          <label class="modal-label">Notas Internas</label>
+          <textarea class="modal-input" id="ncNotas" rows="2" placeholder="Notas visíveis apenas à coordenação..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalNovoCoord')">Cancelar</button>
+        <button class="btn btn-primary" id="btnCriarCoord" onclick="criarCoord()"><i class="fas fa-shield-alt"></i> Criar Coordenador</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDITAR COORDENADOR -->
+  <div class="modal-overlay hidden" id="modalEditCoord">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fas fa-pen" style="color:var(--gold)"></i> Editar Coordenador</h3>
+        <button onclick="closeModal('modalEditCoord')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.9rem;">
+          <div class="modal-group" style="margin-bottom:0;">
+            <label class="modal-label">Nome *</label>
+            <input class="modal-input" type="text" id="ecNome" placeholder="Nome completo..." />
+            <span class="modal-err" id="err-ecNome"></span>
+          </div>
+          <div class="modal-group" style="margin-bottom:0;">
+            <label class="modal-label">Apelido</label>
+            <input class="modal-input" type="text" id="ecApelido" placeholder="Apelido no clube..." />
+          </div>
+        </div>
+        <div class="modal-group" style="margin-top:0.9rem;">
+          <label class="modal-label">E-mail</label>
+          <input class="modal-input" type="email" id="ecEmail" placeholder="email@exemplo.com" />
+          <span class="modal-err" id="err-ecEmail"></span>
+        </div>
+        <div class="modal-group">
+          <label class="modal-label">Nova Senha (deixa em branco para não alterar)</label>
+          <input class="modal-input" type="text" id="ecSenha" placeholder="Nova senha provisória..." />
+        </div>
+        <div class="modal-group">
+          <label class="modal-label">Notas Internas</label>
+          <textarea class="modal-input" id="ecNotas" rows="2" placeholder="Notas visíveis apenas à coordenação..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalEditCoord')">Cancelar</button>
+        <button class="btn btn-primary" id="btnSalvarCoord" onclick="salvarEdicaoCoord()"><i class="fas fa-check"></i> Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: VER INFORMAÇÕES DO MEMBRO -->
+  <div class="modal-overlay hidden" id="modalInfo">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fas fa-id-card"></i> Informações do Membro</h3>
+        <button onclick="closeModal('modalInfo')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" id="modalInfoBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalInfo')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="dashboard-coord.js"></script>
+
+  <!-- MODAL: NOVO / EDITAR EVENTO -->
+  <div class="modal-overlay hidden" id="modalEvento">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fas fa-calendar-alt" style="color:var(--gold)"></i> <span id="modalEventoTitulo">Novo Evento</span></h3>
+        <button data-action="close-modalEvento"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-group">
+          <label class="modal-label">Título *</label>
+          <input class="modal-input" type="text" id="eventoTitulo" placeholder="Ex: Encontro Semanal, Sessão de Iniciação..." />
+          <span class="modal-err" id="err-eventoTitulo"></span>
+        </div>
+        <div class="modal-group">
+          <label class="modal-label">Dia / Período</label>
+          <input class="modal-input" type="text" id="eventoDia" placeholder="Ex: QUA, SEX, 15 Jun, Mensal..." />
+        </div>
+        <div class="modal-group">
+          <label class="modal-label">Horário</label>
+          <input class="modal-input" type="text" id="eventoHorario" placeholder="Ex: Quartas-feiras • 15h00 – 17h00" />
+        </div>
+        <div class="modal-group">
+          <label class="modal-label">Local</label>
+          <input class="modal-input" type="text" id="eventoLocal" placeholder="Ex: Biblioteca Municipal D. Dinis — Polo de Caneças" />
+        </div>
+        <div class="modal-group">
+          <label class="modal-label">Descrição</label>
+          <textarea class="modal-input" id="eventoDesc" rows="2" placeholder="Descrição curta do evento..."></textarea>
+        </div>
+        <div class="modal-group">
+          <label class="modal-label">Tipo</label>
+          <select class="modal-input" id="eventoTipo">
+            <option value="regular">Regular</option>
+            <option value="especial">Especial</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-action="close-modalEvento">Cancelar</button>
+        <button class="btn btn-primary" data-action="salvar-evento" id="btnSalvarEvento"><i class="fas fa-check"></i> Salvar</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

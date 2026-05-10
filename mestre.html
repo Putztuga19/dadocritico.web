@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel do Mestre — Dado Crítico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+  <style>
+    /* ── TEMA MESTRE (roxo/sombrio) ── */
+    :root {
+      --mestre:       #a374e8;
+      --mestre-dim:   rgba(163,116,232,0.15);
+      --mestre-mid:   rgba(163,116,232,0.25);
+      --mestre-glow:  0 0 20px rgba(163,116,232,0.3);
+    }
+
+    /* Scrollbar roxa para mestres */
+    ::-webkit-scrollbar-thumb { background: var(--mestre) !important; }
+
+    /* Sidebar mestre — fundo ainda mais sombrio */
+    .dash-sidebar {
+      background: linear-gradient(180deg, #18151f 0%, #1c1822 60%, #1c1c20 100%);
+      border-right-color: rgba(163,116,232,0.18);
+    }
+
+    .sidebar-link:hover, .sidebar-link.active {
+      color: var(--mestre) !important;
+      border-left-color: var(--mestre) !important;
+      background: var(--mestre-dim) !important;
+    }
+
+    .sidebar-link .badge {
+      background: var(--mestre);
+      color: #fff;
+    }
+
+    /* Avatar mestre */
+    #avatarCircle {
+      border-color: var(--mestre) !important;
+      background: var(--mestre-dim) !important;
+      color: var(--mestre) !important;
+      font-size: 1.6rem;
+      cursor: pointer;
+      position: relative;
+      overflow: visible;
+    }
+    #avatarCircle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    #avatarCircle:hover::after {
+      content: '\f030';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: #fff;
+    }
+
+    /* Botão primário → roxo para mestre */
+    .btn-primary {
+      background: var(--mestre) !important;
+      border-color: var(--mestre) !important;
+      color: #fff !important;
+    }
+    .btn-primary:hover {
+      background: #8b5ed4 !important;
+      border-color: #8b5ed4 !important;
+      box-shadow: var(--mestre-glow) !important;
+    }
+
+    /* ── PERFIL MESTRE ── */
+    .perfil-mestre-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .perfil-mestre-grid .profile-card.full { grid-column: 1 / -1; }
+
+    .bio-field {
+      width: 100%;
+      min-height: 90px;
+      padding: 0.72rem 1rem;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--white);
+      font-family: var(--font-b);
+      font-size: 1rem;
+      resize: vertical;
+      outline: none;
+      transition: border-color var(--ease);
+      box-sizing: border-box;
+    }
+    .bio-field:focus { border-color: var(--mestre); }
+    .bio-field::placeholder { color: var(--muted); }
+
+    .sistemas-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 0.5rem;
+    }
+    .sistema-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.75rem;
+      background: var(--mestre-dim);
+      border: 1px solid var(--mestre-mid);
+      border-radius: 99px;
+      font-family: var(--font-h);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--mestre);
+    }
+    .sistema-chip button {
+      background: none;
+      border: none;
+      color: var(--mestre);
+      cursor: pointer;
+      padding: 0;
+      font-size: 0.7rem;
+      opacity: 0.6;
+      transition: opacity var(--ease);
+      line-height: 1;
+    }
+    .sistema-chip button:hover { opacity: 1; }
+
+    .add-sistema-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.6rem;
+    }
+    .add-sistema-row input {
+      flex: 1;
+      padding: 0.55rem 0.85rem;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--white);
+      font-family: var(--font-b);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color var(--ease);
+    }
+    .add-sistema-row input:focus { border-color: var(--mestre); }
+    .add-sistema-row input::placeholder { color: var(--muted); }
+    .btn-add-sistema {
+      padding: 0.55rem 1rem;
+      background: var(--mestre-dim);
+      border: 1px solid var(--mestre-mid);
+      border-radius: var(--radius);
+      color: var(--mestre);
+      font-family: var(--font-h);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all var(--ease);
+      white-space: nowrap;
+    }
+    .btn-add-sistema:hover { background: var(--mestre-mid); }
+
+    .btn-salvar-perfil {
+      margin-top: 1.2rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .perfil-saved-msg {
+      font-size: 0.82rem;
+      color: #2dbe6c;
+      margin-left: 0.75rem;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .perfil-saved-msg.show { opacity: 1; }
+
+    /* ── MESAS ── */
+    .mesas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+    .mesa-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.2rem 1.25rem 1rem;
+      transition: border-color var(--ease), box-shadow var(--ease);
+      position: relative;
+    }
+    .mesa-card:hover {
+      border-color: var(--mestre-mid);
+      box-shadow: var(--mestre-glow);
+    }
+    .mesa-card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .mesa-icon {
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      background: var(--mestre-dim);
+      border: 1px solid var(--mestre-mid);
+      color: var(--mestre);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .mesa-card-title {
+      font-family: var(--font-h);
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.3;
+    }
+    .mesa-card-sistema {
+      font-size: 0.78rem;
+      color: var(--mestre);
+      margin-top: 0.15rem;
+    }
+    .mesa-card-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 0.9rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .mesa-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+      padding-top: 0.75rem;
+    }
+    .mesa-status {
+      font-family: var(--font-h);
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.7rem;
+      border-radius: 99px;
+    }
+    .mesa-status.ativa { background: rgba(45,190,108,0.12); color: #2dbe6c; border: 1px solid rgba(45,190,108,0.3); }
+    .mesa-status.pausada { background: rgba(201,168,76,0.12); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
+    .mesa-status.encerrada { background: rgba(136,136,150,0.12); color: var(--muted); border: 1px solid var(--border); }
+    .mesa-vagas {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .mesa-card-actions {
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    /* ── SESSÕES — separador passado/futuro ── */
+    .sessoes-filtros {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .sessao-filtro-btn {
+      padding: 0.4rem 0.9rem;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      color: var(--muted);
+      font-family: var(--font-h);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all var(--ease);
+    }
+    .sessao-filtro-btn.active {
+      background: var(--mestre-dim);
+      border-color: var(--mestre);
+      color: var(--mestre);
+    }
+
+    /* ── NOTAS DE CAMPANHA ── */
+    .notas-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 1rem;
+      height: calc(100vh - 220px);
+      min-height: 400px;
+    }
+    .notas-lista-col {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .notas-lista-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-h);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .btn-nova-nota {
+      background: none;
+      border: 1px solid var(--mestre-mid);
+      border-radius: 6px;
+      width: 26px; height: 26px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--mestre);
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all var(--ease);
+    }
+    .btn-nova-nota:hover { background: var(--mestre-dim); }
+
+    .notas-lista-itens {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem 0;
+    }
+    .nota-item {
+      padding: 0.7rem 1rem;
+      cursor: pointer;
+      border-left: 2px solid transparent;
+      transition: all var(--ease);
+    }
+    .nota-item:hover { background: var(--bg-alt); }
+    .nota-item.active {
+      background: var(--mestre-dim);
+      border-left-color: var(--mestre);
+    }
+    .nota-item-titulo {
+      font-family: var(--font-h);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--white);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .nota-item.active .nota-item-titulo { color: var(--mestre); }
+    .nota-item-preview {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.15rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .nota-item-data {
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-top: 0.1rem;
+      opacity: 0.7;
+    }
+
+    .notas-editor-col {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .notas-editor-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid var(--border);
+      gap: 0.75rem;
+    }
+    .nota-titulo-input {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--white);
+      font-family: var(--font-h);
+      font-size: 0.9rem;
+      font-weight: 700;
+      outline: none;
+      min-width: 0;
+    }
+    .nota-titulo-input::placeholder { color: var(--muted); }
+    .notas-toolbar-actions { display: flex; gap: 0.4rem; }
+    .btn-nota-acao {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.3rem 0.65rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all var(--ease);
+      font-family: var(--font-h);
+      font-size: 0.65rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .btn-nota-acao:hover { border-color: var(--mestre); color: var(--mestre); }
+    .btn-nota-acao.salvar:hover { border-color: #2dbe6c; color: #2dbe6c; }
+    .btn-nota-acao.deletar:hover { border-color: var(--red); color: var(--red); }
+
+    .nota-corpo-area {
+      flex: 1;
+      padding: 1.2rem;
+      background: none;
+      border: none;
+      color: var(--white);
+      font-family: var(--font-b);
+      font-size: 1rem;
+      line-height: 1.7;
+      resize: none;
+      outline: none;
+      overflow-y: auto;
+    }
+    .nota-corpo-area::placeholder { color: var(--muted); opacity: 0.5; }
+
+    .notas-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 0.75rem;
+      color: var(--muted);
+    }
+    .notas-empty i { font-size: 2.5rem; opacity: 0.3; color: var(--mestre); }
+    .notas-empty p { font-size: 0.9rem; text-align: center; }
+
+    /* ── MODAIS ── */
+    .modal-group { margin-bottom: 1.1rem; }
+    .modal-label {
+      display: block;
+      font-family: var(--font-h);
+      font-size: 0.67rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+    .modal-input {
+      width: 100%;
+      padding: 0.72rem 1rem;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--white);
+      font-family: var(--font-b);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color var(--ease);
+      box-sizing: border-box;
+    }
+    .modal-input:focus { border-color: var(--mestre); }
+    .modal-input select { appearance: none; }
+    .modal-err { display: block; color: var(--red); font-size: 0.8rem; margin-top: 0.3rem; min-height: 1em; }
+    textarea.modal-input { resize: vertical; min-height: 80px; }
+
+    .formato-opt {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.6rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--muted);
+      transition: all var(--ease);
+      user-select: none;
+    }
+    .formato-opt:has(input:checked) { border-color: var(--mestre); color: var(--mestre); background: var(--mestre-dim); }
+    .formato-opt input { display: none; }
+
+    .btn-acao {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: all var(--ease);
+      font-size: 0.75rem;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .btn-acao.edit:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-acao.remove:hover { border-color: var(--red); color: var(--red); }
+
+    /* Avatar upload hidden input */
+    #avatarUpload { display: none; }
+
+    /* Responsive */
+    @media (max-width: 700px) {
+      .notas-layout { grid-template-columns: 1fr; height: auto; }
+      .notas-lista-col { height: 200px; }
+      .perfil-mestre-grid { grid-template-columns: 1fr; }
+      .mesas-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="dash-body">
+
+  <nav class="navbar scrolled" id="navbar">
+    <a href="index.html" class="nav-logo"><img src="logo.png" alt="Dado Crítico" /></a>
+    <div class="nav-user">
+      <span class="nav-user-name" id="navUserName">Mestre</span>
+      <button class="btn-logout" onclick="_doLogoutSair()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+    </div>
+  </nav>
+
+  <main class="dash-main">
+    <aside class="dash-sidebar">
+      <div class="sidebar-avatar">
+        <div class="avatar-circle" id="avatarCircle" onclick="document.getElementById('avatarUpload').click()" title="Clica para alterar foto">M</div>
+        <input type="file" id="avatarUpload" accept="image/*" />
+        <div class="sidebar-name" id="sidebarName">—</div>
+        <div class="sidebar-role" style="background:rgba(138,99,210,0.15);color:#a374e8;border:1px solid #a374e8;border-radius:99px;padding:0.2rem 0.75rem;font-family:var(--font-h);font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-top:0.4rem;display:inline-flex;align-items:center;gap:0.3rem;">
+          <i class="fas fa-hat-wizard"></i> Mestre
+        </div>
+        <div style="font-family:var(--font-h);font-size:0.68rem;color:#a374e8;margin-top:0.3rem;letter-spacing:0.08em;" id="sidebarCode"></div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="sidebar-link active" data-section="perfil">
+          <i class="fas fa-user"></i> Meu Perfil
+        </a>
+        <a href="#" class="sidebar-link" data-section="mesas">
+          <i class="fas fa-scroll"></i> Minhas Mesas
+          <span class="badge" id="badgeMesas" style="display:none">0</span>
+        </a>
+        <a href="#" class="sidebar-link" data-section="sessoes">
+          <i class="fas fa-dice-d20"></i> Sessões
+          <span class="badge" id="badgeSessoes" style="display:none">0</span>
+        </a>
+        <a href="#" class="sidebar-link" data-section="notas">
+          <i class="fas fa-book-open"></i> Notas de Campanha
+          <span class="badge" id="badgeNotas" style="display:none">0</span>
+        </a>
+        <a href="#" class="sidebar-link" data-section="eventos">
+          <i class="fas fa-calendar-alt"></i> Próximos Eventos
+        </a>
+        <a href="membro.html" class="sidebar-link" style="margin-top:0.5rem;opacity:0.75;">
+          <i class="fas fa-user"></i> Área de Membro
+        </a>
+      </nav>
+      <button class="btn-logout-full" onclick="_doLogoutConta()">
+        <i class="fas fa-sign-out-alt"></i> Sair da conta
+      </button>
+    </aside>
+
+    <div class="dash-content">
+
+      <!-- ===================== PERFIL ===================== -->
+      <section class="dash-section active" id="section-perfil">
+        <div class="dash-section-header">
+          <h2><i class="fas fa-user"></i> Meu Perfil</h2>
+        </div>
+        <div class="status-banner aprovado">
+          <div class="status-icon"><i class="fas fa-hat-wizard"></i></div>
+          <div>
+            <strong>Mestre ativo</strong>
+            <p>Podes criar e gerir mesas e sessões de RPG. Boas aventuras, mestre!</p>
+          </div>
+        </div>
+        <div class="perfil-mestre-grid">
+          <div class="profile-card"><label>Nome Completo</label><p id="pNome">—</p></div>
+          <div class="profile-card"><label>E-mail</label><p id="pEmail">—</p></div>
+          <div class="profile-card"><label>Apelido no Clube</label><p id="pApelido">—</p></div>
+          <div class="profile-card"><label>Data de Entrada</label><p id="pEntrada">—</p></div>
+          <div class="profile-card"><label>Nº de Mestre</label><p id="pNumero" style="font-family:var(--font-h);color:#a374e8;">—</p></div>
+          <div class="profile-card"><label>Cargo</label><p style="color:#a374e8;font-family:var(--font-h);font-size:0.85rem;"><i class="fas fa-hat-wizard"></i> Mestre</p></div>
+
+          <!-- Bio -->
+          <div class="profile-card full">
+            <label>Bio do Mestre</label>
+            <textarea class="bio-field" id="pBio" placeholder="Conta um pouco sobre ti como mestre... Que tipos de histórias gostas de narrar? Qual é o teu estilo de jogo?"></textarea>
+          </div>
+
+          <!-- Sistemas que narra -->
+          <div class="profile-card full">
+            <label>Sistemas que Narras</label>
+            <div class="sistemas-chips" id="sistemasChips"></div>
+            <div class="add-sistema-row">
+              <input type="text" id="novoSistemaInput" placeholder="Ex: D&D 5e, Pathfinder, Call of Cthulhu..." />
+              <button class="btn-add-sistema" onclick="adicionarSistema()"><i class="fas fa-plus"></i> Adicionar</button>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;margin-top:1.2rem;">
+          <button class="btn btn-primary btn-salvar-perfil" onclick="salvarPerfil()">
+            <i class="fas fa-save"></i> Guardar Perfil
+          </button>
+          <span class="perfil-saved-msg" id="perfilSavedMsg"><i class="fas fa-check-circle"></i> Guardado!</span>
+        </div>
+      </section>
+
+      <!-- ===================== MINHAS MESAS ===================== -->
+      <section class="dash-section" id="section-mesas">
+        <div class="dash-section-header">
+          <h2><i class="fas fa-scroll"></i> Minhas Mesas</h2>
+          <button class="btn btn-primary" onclick="abrirNovaMesa()">
+            <i class="fas fa-plus"></i> <span>Nova Mesa</span>
+          </button>
+        </div>
+        <p class="section-desc">As tuas mesas de RPG. Gere os detalhes, o estado e os jogadores de cada uma.</p>
+        <div class="mesas-grid" id="mesasGrid">
+          <div class="empty-state" id="emptyMesas" style="grid-column:1/-1;">
+            <i class="fas fa-scroll"></i>
+            <p>Ainda não tens nenhuma mesa criada.<br>Clica em <strong>Nova Mesa</strong> para começar.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== SESSÕES ===================== -->
+      <section class="dash-section" id="section-sessoes">
+        <div class="dash-section-header">
+          <h2><i class="fas fa-dice-d20"></i> Sessões</h2>
+          <button class="btn btn-primary" onclick="abrirNovaSessao()">
+            <i class="fas fa-plus"></i> <span>Nova Sessão</span>
+          </button>
+        </div>
+        <p class="section-desc">Agenda, regista e acompanha todas as tuas sessões.</p>
+
+        <div class="sessoes-filtros">
+          <button class="sessao-filtro-btn active" data-filtro="futuras" onclick="filtrarSessoes('futuras')">Agendadas</button>
+          <button class="sessao-filtro-btn" data-filtro="passadas" onclick="filtrarSessoes('passadas')">Histórico</button>
+          <button class="sessao-filtro-btn" data-filtro="todas" onclick="filtrarSessoes('todas')">Todas</button>
+        </div>
+
+        <div class="fichas-lista" id="sessoesList">
+          <div class="empty-state" id="emptySessoes">
+            <i class="fas fa-dice-d20"></i>
+            <p>Nenhuma sessão encontrada.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== NOTAS DE CAMPANHA ===================== -->
+      <section class="dash-section" id="section-notas">
+        <div class="dash-section-header">
+          <h2><i class="fas fa-book-open"></i> Notas de Campanha</h2>
+        </div>
+        <p class="section-desc">As tuas anotações privadas de mestre. Ninguém mais pode ver estas notas.</p>
+
+        <div class="notas-layout">
+          <!-- Lista de notas -->
+          <div class="notas-lista-col">
+            <div class="notas-lista-header">
+              <span>Notas</span>
+              <button class="btn-nova-nota" onclick="novaNota()" title="Nova nota"><i class="fas fa-plus"></i></button>
+            </div>
+            <div class="notas-lista-itens" id="notasListaItens">
+              <!-- preenchido por JS -->
+            </div>
+          </div>
+
+          <!-- Editor -->
+          <div class="notas-editor-col">
+            <div id="notasEditorEmpty" class="notas-empty">
+              <i class="fas fa-feather-alt"></i>
+              <p>Seleciona uma nota ou cria uma nova<br>para começar a escrever.</p>
+            </div>
+            <div id="notasEditor" style="display:none;flex-direction:column;height:100%;">
+              <div class="notas-editor-toolbar">
+                <input class="nota-titulo-input" id="notaTituloInput" placeholder="Título da nota..." />
+                <div class="notas-toolbar-actions">
+                  <button class="btn-nota-acao salvar" onclick="salvarNotaAtual()"><i class="fas fa-save"></i> Guardar</button>
+                  <button class="btn-nota-acao deletar" onclick="deletarNotaAtual()"><i class="fas fa-trash"></i></button>
+                </div>
+              </div>
+              <textarea class="nota-corpo-area" id="notaCorpoArea" placeholder="Escreve as tuas notas aqui... NPCs, tramas secretas, pistas, ideias para sessões futuras..."></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== PRÓXIMOS EVENTOS ===================== -->
+      <section class="dash-section" id="section-eventos">
+        <div class="dash-section-header">
+          <h2><i class="fas fa-calendar-alt"></i> Próximos Eventos</h2>
+        </div>
+        <p class="section-desc">Eventos publicados pela coordenação.</p>
+        <div class="eventos-grid" id="eventosGridMestre">
+          <div class="empty-state" id="emptyEventosMestre" style="display:none;">
+            <i class="fas fa-calendar-alt"></i>
+            <p>Nenhum evento publicado ainda.</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- MODAL: NOVA / EDITAR MESA -->
+  <div class="modal-overlay hidden" id="modalMesa">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fas fa-scroll" style="color:#a374e8"></i> <span id="modalMesaTitulo">Nova Mesa</span></h3>
+        <button onclick="closeModal('modalMesa')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-group">
+          <label class="modal-label">Nome da Mesa *</label>
+          <input class="modal-input" type="text" id="mesaNome" placeholder="Ex: A Maldição de Strahd..." />
+          <span class="modal-err" id="err-mesaNome"></span>
+        </div>
+        <div class="modal-group">
+          <label class="modal-label">Sistema de RPG</label>
+          <input class="modal-input" type="text" id="mesaSistema" placeholder="Ex: D&D 5e, Call of Cthulhu..." />
+        </div>
+        <div class="modal-group">
+          <label class="modal-label">Estado</label>
+          <select class="modal-input" id="mesaStatus">
+            <option value="ativa">Ativa</option>
+            <option value="pausada">Pausada</option>
+            <option value="encerrada">Encerrada</option>
+          </select>
+        </div>
+        <div class="modal-group">
+          <label class="modal-label">Nº máximo de jogadores</label>
+          <input class="modal-input" type="number" id="mesaVagas" min="1" max="20" placeholder="Ex: 5" />
+        </div>
+        <div class="modal-group">
+          <label class="modal-label">Descrição / Sinopse</label>
+          <textarea class="modal-input" id="mesaDesc" rows="3" placeholder="Uma breve sinopse da campanha..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalMesa')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarMesa()"><i class="fas fa-check"></i> Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: NOVA / EDITAR SESSÃO -->
+  <div class="modal-overlay hidden" id="modalSessao">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fas fa-dice-d20" style="color:#a374e8"></i> <span id="modalSessaoTitulo">Nova Sessão</span></h3>
+        <button onclick="closeModal('modalSessao')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-group">
+          <label class="modal-label">Mesa (opcional)</label>
+          <select class="modal-input" id="sessaoMesaId">
+            <option value="">— Sessão avulsa —</option>
+          </select>
+        </div>
+        <div class="modal-group">
+          <label class="modal-label">Título da Sessão *</label>
+          <input class="modal-input" type="text" id="sessaoTitulo" placeholder="Ex: A Taverna do Dragão Vermelho..." />
+          <span class="modal-err" id="err-sessaoTitulo"></span>
+        </div>
+        <div class="modal-group">
+          <label class="modal-label">Sistema de RPG</label>
+          <input class="modal-input" type="text" id="sessaoSistema" placeholder="Ex: D&D 5e, Pathfinder..." />
+        </div>
+        <div class="modal-group">
+          <label class="modal-label">Formato *</label>
+          <div style="display:flex;gap:0.75rem;margin-top:0.2rem;">
+            <label class="formato-opt" id="optPresencial">
+              <input type="radio" name="formato" value="presencial" onchange="onFormatoChange()" />
+              <i class="fas fa-map-marker-alt"></i> Presencial
+            </label>
+            <label class="formato-opt" id="optOnline">
+              <input type="radio" name="formato" value="online" onchange="onFormatoChange()" checked />
+              <i class="fas fa-wifi"></i> Online
+            </label>
+          </div>
+        </div>
+        <div class="modal-group" id="grupoSala" style="display:none;">
+          <div style="display:flex;align-items:center;gap:0.6rem;padding:0.75rem 1rem;background:rgba(138,99,210,0.07);border:1px solid rgba(138,99,210,0.25);border-radius:var(--radius);font-size:0.88rem;">
+            <i class="fas fa-door-open" style="color:#a374e8;"></i>
+            <span id="salaInfo" style="color:var(--muted);">A verificar disponibilidade da sala...</span>
+          </div>
+        </div>
+        <div class="modal-group">
+          <label class="modal-label">Data e Hora *</label>
+          <input class="modal-input" type="datetime-local" id="sessaoData" onchange="verificarSala()" />
+          <span class="modal-err" id="err-sessaoData"></span>
+        </div>
+        <div class="modal-group">
+          <label class="modal-label">Vagas (nº de jogadores)</label>
+          <input class="modal-input" type="number" id="sessaoVagas" min="1" max="20" placeholder="Ex: 5" />
+        </div>
+        <div class="modal-group">
+          <label class="modal-label">Descrição / Gancho da aventura</label>
+          <textarea class="modal-input" id="sessaoDesc" rows="3" placeholder="Conta um pouco sobre a aventura..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalSessao')">Cancelar</button>
+        <button class="btn btn-primary" id="btnSalvarSessao" onclick="salvarSessao()"><i class="fas fa-check"></i> Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIRMAR -->
+  <div class="modal-overlay hidden" id="modalConfirm">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h3 id="confirmTitle">Confirmar</h3>
+        <button onclick="closeModal('modalConfirm')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmMsg" style="color:var(--muted);line-height:1.6;"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalConfirm')">Cancelar</button>
+        <button class="btn btn-primary" id="confirmBtn">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="dashboard-mestre.js"></script>
+</body>
+</html>

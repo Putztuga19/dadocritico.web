@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meu Perfil — Dado Crítico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body class="dash-body">
+
+  <!-- NAVBAR -->
+  <nav class="navbar scrolled" id="navbar">
+    <a href="index.html" class="nav-logo">
+      <img src="logo.png" alt="Dado Crítico" />
+    </a>
+    <div class="nav-user" id="navUser">
+      <span class="nav-user-name" id="navUserName">Aventureiro</span>
+      <button class="btn-logout" onclick="_doLogoutSair()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+    </div>
+  </nav>
+
+  <main class="dash-main">
+
+    <!-- SIDEBAR -->
+    <aside class="dash-sidebar">
+      <div class="sidebar-avatar">
+        <div class="avatar-circle" id="avatarCircle">?</div>
+        <div class="sidebar-name" id="sidebarName">—</div>
+        <div class="sidebar-role member">Membro</div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="sidebar-link active" data-section="perfil">
+          <i class="fas fa-user"></i> Meu Perfil
+        </a>
+        <a href="#" class="sidebar-link" data-section="eventos">
+          <i class="fas fa-calendar-alt"></i> Próximos Eventos
+        </a>
+      </nav>
+      <button class="btn-logout-full" onclick="_doLogoutConta()">
+        <i class="fas fa-sign-out-alt"></i> Sair da conta
+      </button>
+    </aside>
+
+    <!-- CONTEÚDO -->
+    <div class="dash-content">
+
+      <!-- ═══ PERFIL (unificado com cartão) ═══ -->
+      <section class="dash-section active" id="section-perfil">
+
+        <div class="dash-section-header">
+          <h2><i class="fas fa-user"></i> Meu Perfil</h2>
+          <button class="btn btn-outline btn-sm" onclick="abrirModalEdicao()">
+            <i class="fas fa-pen"></i> Editar Perfil
+          </button>
+        </div>
+
+        <!-- Banner de status (só se recusado) -->
+        <div class="status-banner" id="statusBanner">
+          <div class="status-icon" id="statusIcon"><i class="fas fa-hourglass-half"></i></div>
+          <div>
+            <strong id="statusTitle">Aguardando aprovação</strong>
+            <p id="statusMsg">Sua ficha está sendo analisada pelos coordenadores.</p>
+          </div>
+        </div>
+
+        <!-- ── BLOCO SUPERIOR: foto/bio + cartão lado a lado ── -->
+        <div class="perfil-unificado">
+
+          <!-- Esquerda: foto + bio + dados -->
+          <div class="perfil-lado-esq">
+            <div class="perfil-topo">
+              <div class="perfil-foto" id="perfilFotoPreview">
+                <span id="perfilFotoInicial">?</span>
+                <img id="perfilFotoImg" src="" alt="" style="display:none;" />
+              </div>
+              <div class="perfil-bio-wrap">
+                <div class="perfil-apelido" id="perfilApelidoDisplay">—</div>
+                <div class="perfil-bio" id="perfilBioDisplay"><em>Sem bio ainda.</em></div>
+              </div>
+            </div>
+
+            <div class="profile-grid">
+              <div class="profile-card">
+                <label>Nome Completo</label>
+                <p id="pNome">—</p>
+              </div>
+              <div class="profile-card">
+                <label>E-mail</label>
+                <p id="pEmail">—</p>
+              </div>
+              <div class="profile-card">
+                <label>Apelido no Clube</label>
+                <p id="pApelido">—</p>
+              </div>
+              <div class="profile-card">
+                <label>Data de Entrada</label>
+                <p id="pEntrada">—</p>
+              </div>
+              <div class="profile-card">
+                <label>Nº de Membro</label>
+                <p id="pNumero">—</p>
+              </div>
+              <div class="profile-card">
+                <label>Status</label>
+                <p id="pStatus">—</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Direita: cartão digital -->
+          <div class="perfil-lado-dir" id="perfil-lado-dir">
+            <div class="perfil-cartao-titulo">
+              <i class="fas fa-id-card"></i> Cartão de Membro
+            </div>
+
+            <!-- Cartão bloqueado -->
+            <div class="cartao-locked" id="cartaoLocked">
+              <i class="fas fa-lock"></i>
+              <p>Disponível após aprovação pelos coordenadores</p>
+            </div>
+
+            <!-- Cartão desbloqueado -->
+            <div class="cartao-digital hidden" id="cartaoDigital">
+              <div class="cartao">
+                <div class="cartao-bg"></div>
+                <div class="cartao-header">
+                  <img src="logo.png" alt="Dado Crítico" class="cartao-logo" />
+                  <span class="cartao-titulo">Cartão de Membro</span>
+                </div>
+                <div class="cartao-body">
+                  <div class="cartao-row"><span>Nome</span><strong id="cNome">—</strong></div>
+                  <div class="cartao-row"><span>Nº de ID</span><strong id="cNumero">—</strong></div>
+                  <div class="cartao-row"><span>Data de Entrada</span><strong id="cEntrada">—</strong></div>
+                  <div class="cartao-row"><span>Validade</span><strong id="cValidade">—</strong></div>
+                </div>
+              </div>
+              <button class="btn btn-outline btn-cartao-dl" onclick="downloadCartao()">
+                <i class="fas fa-download"></i> Baixar Cartão
+              </button>
+            </div>
+          </div>
+
+        </div><!-- /perfil-unificado -->
+
+      </section>
+
+      <!-- ═══ MODAL EDIÇÃO ═══ -->
+      <div class="modal-overlay hidden" id="modalEdicao">
+        <div class="modal-box modal-perfil-edit">
+          <div class="modal-header">
+            <h3><i class="fas fa-pen"></i> Editar Perfil</h3>
+            <button class="modal-close" onclick="fecharModalEdicao()"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="modal-body">
+
+            <div class="edit-foto-area">
+              <div class="edit-foto-preview" id="editFotoPreview">
+                <span id="editFotoInicial">?</span>
+                <img id="editFotoImg" src="" alt="" style="display:none;" />
+              </div>
+              <div class="edit-foto-actions">
+                <label class="btn btn-outline btn-sm" for="inputFoto" style="cursor:pointer;">
+                  <i class="fas fa-camera"></i> Escolher foto
+                </label>
+                <input type="file" id="inputFoto" accept="image/*" style="display:none;" onchange="previewFoto(event)" />
+                <button class="btn btn-ghost btn-sm" id="btnRemoverFoto" onclick="removerFoto()" style="display:none;">
+                  <i class="fas fa-trash"></i> Remover
+                </button>
+              </div>
+              <p class="edit-foto-hint">JPG ou PNG · máx 5 MB</p>
+            </div>
+
+            <div class="edit-field">
+              <label for="editApelido">Apelido no Clube</label>
+              <input type="text" id="editApelido" maxlength="30" placeholder="Seu apelido…" />
+            </div>
+
+            <div class="edit-field">
+              <label for="editBio">Bio <span class="edit-field-hint">(máx. 160 caracteres)</span></label>
+              <textarea id="editBio" maxlength="160" rows="3" placeholder="Conte um pouco sobre você…"></textarea>
+              <div class="bio-counter"><span id="bioCount">0</span>/160</div>
+            </div>
+
+            <div class="edit-feedback hidden" id="editFeedback"></div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="fecharModalEdicao()">Cancelar</button>
+            <button class="btn btn-primary" id="btnSalvarPerfil" onclick="salvarPerfil()">
+              <i class="fas fa-save"></i> Salvar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ EVENTOS ═══ -->
+      <section class="dash-section" id="section-eventos">
+        <div class="dash-section-header">
+          <h2><i class="fas fa-calendar-alt"></i> Próximos Encontros</h2>
+        </div>
+        <div class="eventos-grid" id="eventosGrid">
+          <div class="empty-state" id="emptyEventosMembro" style="display:none;">
+            <i class="fas fa-calendar-alt"></i>
+            <p>Nenhum evento publicado ainda.</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script type="module" src="dashboard-member.js"></script>
+</body>
+</html>
